@@ -1,34 +1,12 @@
 package main
 
 import (
-	// "github.com/hibiken/asynq"
 	h "app/handler"
 	m "app/model"
 	"github.com/labstack/echo/v4"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
-
-// func init() {
-// 	// Inicia o servidor de mensagens
-// 	srv := asynq.NewServer(
-// 		asynq.RedisClientOpt{Addr: "127.0.0.1:6379"},
-// 		asynq.Config{
-// 			// Specify how many concurrent workers to use
-// 			Concurrency: 10,
-// 			// Optionally specify multiple queues with different priority.
-// 			Queues: map[string]int{
-// 				"critical": 6,
-// 				"default":  3,
-// 				"low":      1,
-// 			},
-// 			// See the godoc for other configuration options
-// 		},
-// 	)
-
-// 	// Inicia o servidor de mensagens
-// 	if err := srv.Run(); err != nil {
-// }
 
 func main() {
 	e := echo.New()
