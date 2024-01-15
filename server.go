@@ -48,10 +48,18 @@ func main() {
 	e.GET("/", func(c echo.Context) error {
 		return h.GetTasksHandler(c, handler)
 	})
-	// e.GET("/:id", h.GetTask)
-	// e.POST("/", h.CreateTask)
-	// e.PUT("/:id", h.UpdateTask)
-	// e.DELETE("/:id", h.DeleteTask)
+	e.GET("/:id", func(c echo.Context) error {
+		return h.GetTaskByIdHandler(c, handler)
+	})
+	e.POST("/", func(c echo.Context) error {
+		return h.CreateTaskHandler(c, handler)
+	})
+	e.PUT("/:id", func(c echo.Context) error {
+		return h.UpdateTaskHandler(c, handler)
+	})
+	e.DELETE("/:id", func(c echo.Context) error {
+		return h.DeleteTaskHandler(c, handler)
+	})
 
 	e.Logger.Fatal(e.Start(":1323"))
 }

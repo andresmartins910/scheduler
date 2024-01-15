@@ -14,40 +14,42 @@ func GetTasksHandler(c echo.Context, h *Handler) error {
 	return c.JSONPretty(http.StatusOK, tasks, "  ")
 }
 
-// func GetTask(c echo.Context) error {
-// 	var task m.Task
-// 	DB.First(&task, c.Param("id"))
+func GetTaskByIdHandler(c echo.Context, h *Handler) error {
+	var task m.Task
 
-// 	return c.JSONPretty(http.StatusOK, task, "  ")
-// }
+	h.DB.First(&task, c.Param("id"))
 
-// func CreateTask(c echo.Context) error {
-// 	var task m.Task
-// 	c.Bind(&task)
+	return c.JSONPretty(http.StatusOK, task, "  ")
+}
 
-// 	result := DB.Create(&task)
+func CreateTaskHandler(c echo.Context, h *Handler) error {
+	var task m.Task
 
-// 	if result.Error != nil {
-// 		return result.Error
-// 	}
+	c.Bind(&task)
 
-// 	return c.JSONPretty(http.StatusOK, task, "  ")
-// }
+	h.DB.Create(&task)
 
-// func UpdateTask(c echo.Context) error {
-// 	var task m.Task
-// 	DB.First(&task, c.Param("id"))
-// 	c.Bind(&task)
+	return c.JSONPretty(http.StatusOK, task, "  ")
+}
 
-// 	DB.Save(&task)
+func UpdateTaskHandler(c echo.Context, h *Handler) error {
+	var task m.Task
 
-// 	return c.JSONPretty(http.StatusOK, task, "  ")
-// }
+	h.DB.First(&task, c.Param("id"))
 
-// func DeleteTask(c echo.Context) error {
-// 	var task m.Task
-// 	DB.First(&task, c.Param("id"))
-// 	DB.Delete(&task)
+	c.Bind(&task)
 
-// 	return c.JSONPretty(http.StatusOK, task, "  ")
-// }
+	h.DB.Save(&task)
+
+	return c.JSONPretty(http.StatusOK, task, "  ")
+}
+
+func DeleteTaskHandler(c echo.Context, h *Handler) error {
+	var task m.Task
+
+	h.DB.First(&task, c.Param("id"))
+
+	h.DB.Delete(&task)
+
+	return c.JSONPretty(http.StatusOK, task, "  ")
+}
