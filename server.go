@@ -3,6 +3,7 @@ package main
 import (
 	h "app/handler"
 	m "app/model"
+	"github.com/hibiken/asynq"
 	"github.com/labstack/echo/v4"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -10,6 +11,8 @@ import (
 
 func main() {
 	e := echo.New()
+
+	asynq.NewClient(asynq.RedisClientOpt{Addr: "localhost:6379"})
 
 	dsn := "root:220422@ndrE@tcp(127.0.0.1:3306)/scheduler?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})

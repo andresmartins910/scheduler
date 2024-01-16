@@ -1,9 +1,11 @@
 package handler
 
-import "gorm.io/gorm"
+import (
+	"github.com/hibiken/asynq"
+	"gorm.io/gorm"
+)
 
 type Handler struct {
-	DB *gorm.DB
+	DB     *gorm.DB
+	Client *asynq.Client
 }
-
-// TODO: separar handler de testes

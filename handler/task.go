@@ -2,7 +2,10 @@ package handler
 
 import (
 	m "app/model"
+	"encoding/json"
+	"github.com/hibiken/asynq"
 	"github.com/labstack/echo/v4"
+	"log"
 	"net/http"
 )
 
@@ -23,11 +26,31 @@ func GetTaskByIdHandler(c echo.Context, h *Handler) error {
 }
 
 func CreateTaskHandler(c echo.Context, h *Handler) error {
+	// db
 	var task m.Task
 
 	c.Bind(&task)
 
 	h.DB.Create(&task)
+
+	// asynq
+	payload, err := json.Marshal(task)
+
+	if err != nil {
+		return err
+	}
+
+	t := asynq.NewTask("dont.know", payload)
+
+	log.Printf(" [*] Enqueuing task: %+v", t)
+
+	info, err := h.Client.Enqueue(t)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Printf(" [*] Successfully enqueued task: %+v", info)
 
 	return c.JSONPretty(http.StatusOK, task, "  ")
 }
