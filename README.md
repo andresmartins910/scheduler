@@ -5,9 +5,13 @@ Start server:
 go run .
 ```
 
+``` shell
+docker run -p 6379:6379 redis
+```
+
 Curls:
 
-```shell
+``` shell
 # To test the GET / route
 curl http://localhost:1323/
 

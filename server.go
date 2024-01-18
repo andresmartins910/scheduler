@@ -7,12 +7,17 @@ import (
 	"github.com/labstack/echo/v4"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"log"
 )
 
 func main() {
 	e := echo.New()
 
-	asynq.NewClient(asynq.RedisClientOpt{Addr: "localhost:6379"})
+	client := asynq.NewClient(asynq.RedisClientOpt{Addr: "localhost:6379"})
+
+	if client == nil {
+		log.Fatal("failed to create asynq client")
+	}
 
 	dsn := "root:220422@ndrE@tcp(127.0.0.1:3306)/scheduler?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
@@ -23,7 +28,7 @@ func main() {
 
 	db.AutoMigrate(&m.Task{})
 
-	handler := &h.Handler{DB: db}
+	handler := &h.Handler{DB: db, Client: client}
 
 	// Routes
 	e.GET("/", func(c echo.Context) error {
