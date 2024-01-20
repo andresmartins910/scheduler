@@ -5,8 +5,15 @@ Start server:
 go run .
 ```
 
+Docker
 ``` shell
 docker run -p 6379:6379 redis
+```
+Asynq
+``` shell
+# https://github.com/hibiken/asynq/blob/master/tools/asynq/README.md
+asynq dash
+asynq stats
 ```
 
 Curls:
