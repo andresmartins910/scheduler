@@ -26,25 +26,25 @@ func main() {
 		panic("failed to connect database")
 	}
 
-	db.AutoMigrate(&m.Task{})
+	db.AutoMigrate(&m.Report{})
 
 	handler := &h.Handler{DB: db, Client: client}
 
 	// Routes
 	e.GET("/", func(c echo.Context) error {
-		return h.GetTasksHandler(c, handler)
+		return h.GetReportsHandler(c, handler)
 	})
 	e.GET("/:id", func(c echo.Context) error {
-		return h.GetTaskByIdHandler(c, handler)
+		return h.GetReportByIdHandler(c, handler)
 	})
 	e.POST("/", func(c echo.Context) error {
-		return h.CreateTaskHandler(c, handler)
+		return h.CreateReportHandler(c, handler)
 	})
 	e.PUT("/:id", func(c echo.Context) error {
-		return h.UpdateTaskHandler(c, handler)
+		return h.UpdateReportHandler(c, handler)
 	})
 	e.DELETE("/:id", func(c echo.Context) error {
-		return h.DeleteTaskHandler(c, handler)
+		return h.DeleteReportHandler(c, handler)
 	})
 
 	e.Logger.Fatal(e.Start(":1323"))

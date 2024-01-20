@@ -30,26 +30,26 @@ func newTestDatabase(t *testing.T) *gorm.DB {
 	}
 
 	db.Exec("DROP TABLE IF EXISTS tasks")
-	db.AutoMigrate(&m.Task{})
+	db.AutoMigrate(&m.Report{})
 
 	return db
 }
 
-func populateTestTable(db *gorm.DB) []m.Task {
-	tasks := []m.Task{
-		{Title: "Task 1", Status: "TODO"},
-		{Title: "Task 2", Status: "In Progress"},
-		{Title: "Task 3", Status: "Done"},
+func populateTestTable(db *gorm.DB) []m.Report {
+	reports := []m.Report{
+		{Name: "Task 1", Description: "Description 1"},
+		{Name: "Task 2", Description: "Description 2"},
+		{Name: "Task 3", Description: "Description 3"},
 	}
 
-	for _, task := range tasks {
-		db.Create(&task)
+	for _, report := range reports {
+		db.Create(&report)
 	}
 
-	return tasks
+	return reports
 }
 
-func TestGetTasksHandler(t *testing.T) {
+func TestGetReportsHandler(t *testing.T) {
 	db := newTestDatabase(t) // Cria uma instância do banco de dados de teste
 	populateTestTable(db)    // Popula a tabela de teste com dados de teste
 
@@ -63,17 +63,17 @@ func TestGetTasksHandler(t *testing.T) {
 
 	handler := h.Handler{DB: db} // Cria uma instância do handler do DB
 
-	if err := h.GetTasksHandler(c, &handler); err != nil {
+	if err := h.GetReportsHandler(c, &handler); err != nil {
 		t.Fatal(err)
 	}
 
-	got := []m.Task{}
+	got := []m.Report{}
 
 	if err := json.NewDecoder(rec.Body).Decode(&got); err != nil {
 		t.Fatal(err)
 	}
 
-	want := append([]m.Task{}, got...)
+	want := append([]m.Report{}, got...)
 
 	assert.Equal(t, http.StatusOK, rec.Code, "they should be equal") // Verifica se o código de status da resposta é o esperado
 	assert.Len(t, got, len(want), "they should be equal")            // Verifica se o tamanho da resposta é o esperado
