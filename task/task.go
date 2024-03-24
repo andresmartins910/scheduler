@@ -1,55 +1,93 @@
 package task
 
 import (
+	"app/model"
 	"context"
+	"crypto/tls"
 	"encoding/json"
+	"fmt"
 	"log"
+	"net/http"
+	"strings"
+
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3"
 
 	"github.com/hibiken/asynq"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 )
 
-// A list of task types.
 const (
-	TypeWelcomeEmail  = "email:welcome"
-	TypeReminderEmail = "email:reminder"
+	TypeReport = "report"
 )
 
-// Task payload for any email related tasks.
-type emailTaskPayload struct {
-	// ID for the email recipient.
-	UserID int
-}
-
-func NewWelcomeEmailTask(id int) (*asynq.Task, error) {
-	payload, err := json.Marshal(emailTaskPayload{UserID: id})
+// client
+func NewReportTask(ctx context.Context, report model.Report) (*asynq.Task, error) {
+	payload, err := json.Marshal(report)
 	if err != nil {
 		return nil, err
 	}
-	return asynq.NewTask(TypeWelcomeEmail, payload), nil
+
+	return asynq.NewTask(TypeReport, payload), nil
 }
 
-func NewReminderEmailTask(id int) (*asynq.Task, error) {
-	payload, err := json.Marshal(emailTaskPayload{UserID: id})
+// worker
+func ProcessReport(ctx context.Context, t *asynq.Task) error {
+	key := "DO00AV9FDC63L7MZLGML"
+	secret := "9hBvzmSJEUsAJv+PV+wpBvdaAWuDMg1CGpRvAQGcJPw"
+
+	s3Config := &aws.Config{
+		Credentials:      credentials.NewStaticCredentials(key, secret, ""),
+		Endpoint:         aws.String("https://nyc3.digitaloceanspaces.com"),
+		S3ForcePathStyle: aws.Bool(false),
+		Region:           aws.String("nyc3"),
+		HTTPClient:       &http.Client{Transport: &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}},
+	}
+
+	newSession, err := session.NewSession(s3Config)
 	if err != nil {
-		return nil, err
+		log.Fatal(err)
 	}
-	return asynq.NewTask(TypeReminderEmail, payload), nil
-}
 
-func HandleWelcomeEmailTask(ctx context.Context, t *asynq.Task) error {
-	var p emailTaskPayload
-	if err := json.Unmarshal(t.Payload(), &p); err != nil {
-		return err
-	}
-	log.Printf(" [*] Send Welcome Email to User %d", p.UserID)
-	return nil
-}
+	s3Client := s3.New(newSession)
 
-func HandleReminderEmailTask(ctx context.Context, t *asynq.Task) error {
-	var p emailTaskPayload
-	if err := json.Unmarshal(t.Payload(), &p); err != nil {
-		return err
+	dsn := "root:220422@ndrE@tcp(127.0.0.1:3306)/scheduler?charset=utf8mb4&parseTime=True&loc=Local"
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+
+	if err != nil {
+		panic("failed to connect database")
 	}
-	log.Printf(" [*] Send Reminder Email to User %d", p.UserID)
+
+	var reports []model.Report
+	result := db.Where("DATE(created_at) = CURDATE()").Find(&reports)
+	if result.Error != nil {
+		log.Fatal(result.Error)
+	}
+
+	for _, report := range reports {
+		reportJSON, err := json.Marshal(report)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		object := s3.PutObjectInput{
+			Bucket: aws.String("reportsss"),
+			Key:    aws.String(fmt.Sprintf("reports/%s.json", report.Name)),
+			Body:   strings.NewReader(string(reportJSON)),
+			ACL:    aws.String("private"),
+			Metadata: map[string]*string{
+				"x-amz-meta-my-key": aws.String("your-value"),
+			},
+		}
+
+		_, err = s3Client.PutObject(&object)
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+	}
+
 	return nil
 }
