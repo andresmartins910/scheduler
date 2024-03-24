@@ -5,6 +5,12 @@ Start server:
 go run .
 ```
 
+Start workers:
+```shell
+cd workers/
+go run .
+```
+
 Docker
 ``` shell
 docker run -p 6379:6379 redis
@@ -26,7 +32,7 @@ curl http://localhost:1323/
 curl http://localhost:1323/1
 
 # To test the POST / route:
-curl -X POST -H "Content-Type: application/json" -d '{"title":"Task 1","status":"open"}' http://localhost:1323/
+curl -X POST -H "Content-Type: application/json" -d '{"name":"Task 1","description":"open"}' http://localhost:1323/
 
 # To test the PUT /:id route:
 curl -X PUT -H "Content-Type: application/json" -d '{"title":"Updated Task","status":"in progress"}' http://localhost:1323/2
