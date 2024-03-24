@@ -3,11 +3,12 @@ package main
 import (
 	h "app/handler"
 	m "app/model"
+	"log"
+
 	"github.com/hibiken/asynq"
 	"github.com/labstack/echo/v4"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"log"
 )
 
 func main() {
