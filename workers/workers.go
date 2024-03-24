@@ -14,9 +14,9 @@ func main() {
 	)
 
 	mux := asynq.NewServeMux()
-	mux.HandleFunc(task.TypeWelcomeEmail, task.HandleWelcomeEmailTask)
+	mux.HandleFunc(task.TypeReport, task.ProcessReport)
 
-	if err := srv.Run(mux); err != nil {
-		log.Fatal(err)
-	}
+    if err := srv.Run(mux); err != nil {
+        log.Fatalf("could not run server: %v", err)
+    }
 }
