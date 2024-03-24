@@ -2,12 +2,13 @@
 
 Start server:
 ``` shell
+cd cmd/api/
 go run .
 ```
 
 Start workers:
 ```shell
-cd workers/
+cd cmd/workers/
 go run .
 ```
 

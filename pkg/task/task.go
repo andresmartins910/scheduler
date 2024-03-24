@@ -1,7 +1,7 @@
 package task
 
 import (
-	"app/model"
+	"scheduler/pkg/model"
 	"context"
 	"crypto/tls"
 	"encoding/json"

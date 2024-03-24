@@ -13,8 +13,8 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 
-	h "app/handler"
-	m "app/model"
+	h "scheduler/pkg/handler"
+	m "scheduler/pkg/model"
 )
 
 func newTestDatabase(t *testing.T) *gorm.DB {

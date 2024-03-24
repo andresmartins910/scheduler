@@ -1,8 +1,8 @@
 package main
 
 import (
-	"app/task"
 	"log"
+	"scheduler/pkg/task"
 
 	"github.com/hibiken/asynq"
 )
@@ -16,7 +16,7 @@ func main() {
 	mux := asynq.NewServeMux()
 	mux.HandleFunc(task.TypeReport, task.ProcessReport)
 
-    if err := srv.Run(mux); err != nil {
-        log.Fatalf("could not run server: %v", err)
-    }
+	if err := srv.Run(mux); err != nil {
+		log.Fatalf("could not run server: %v", err)
+	}
 }

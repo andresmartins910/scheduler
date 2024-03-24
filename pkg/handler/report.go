@@ -1,11 +1,11 @@
 package handler
 
 import (
-	m "app/model"
-	"app/task"
 	"context"
 	"log"
 	"net/http"
+	m "scheduler/pkg/model"
+	"scheduler/pkg/task"
 
 	"github.com/labstack/echo/v4"
 )
@@ -43,10 +43,10 @@ func CreateReportHandler(c echo.Context, h *Handler) error {
 	}
 
 	info, err := h.Client.Enqueue(t)
-    if err != nil {
-        log.Fatalf("could not enqueue task: %v", err)
-    }
-    log.Printf("enqueued task: id=%s queue=%s", info.ID, info.Queue)
+	if err != nil {
+		log.Fatalf("could not enqueue task: %v", err)
+	}
+	log.Printf("enqueued task: id=%s queue=%s", info.ID, info.Queue)
 
 	return c.JSONPretty(http.StatusOK, report, "  ")
 }

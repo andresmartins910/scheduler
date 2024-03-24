@@ -1,9 +1,9 @@
 package main
 
 import (
-	h "app/handler"
-	m "app/model"
 	"log"
+	h "scheduler/pkg/handler"
+	m "scheduler/pkg/model"
 
 	"github.com/hibiken/asynq"
 	"github.com/labstack/echo/v4"
