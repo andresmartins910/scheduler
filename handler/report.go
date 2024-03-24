@@ -2,11 +2,12 @@ package handler
 
 import (
 	m "app/model"
-	"encoding/json"
-	"github.com/hibiken/asynq"
-	"github.com/labstack/echo/v4"
+	"app/task"
+	"context"
 	"log"
 	"net/http"
+
+	"github.com/labstack/echo/v4"
 )
 
 func GetReportsHandler(c echo.Context, h *Handler) error {
@@ -33,24 +34,19 @@ func CreateReportHandler(c echo.Context, h *Handler) error {
 
 	h.DB.Create(&report)
 
+	ctx := context.Background()
+
 	// asynq
-	payload, err := json.Marshal(report)
-
+	t, err := task.NewReportTask(ctx, report)
 	if err != nil {
-		return err
+		log.Fatalf("could not create task: %v", err)
 	}
-
-	t := asynq.NewTask("dont.know", payload)
-
-	log.Printf(" [*] Enqueuing task: %+v", t)
 
 	info, err := h.Client.Enqueue(t)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	log.Printf(" [*] Successfully enqueued task: %+v", info)
+    if err != nil {
+        log.Fatalf("could not enqueue task: %v", err)
+    }
+    log.Printf("enqueued task: id=%s queue=%s", info.ID, info.Queue)
 
 	return c.JSONPretty(http.StatusOK, report, "  ")
 }
