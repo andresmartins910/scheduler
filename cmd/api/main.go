@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"scheduler/config"
 	h "scheduler/pkg/handler"
@@ -32,6 +33,16 @@ func main() {
 	db.AutoMigrate(&m.Report{})
 
 	handler := &h.Handler{DB: db, Client: client}
+
+	e.Use(middleware.RequestLoggerWithConfig(
+		middleware.RequestLoggerConfig{
+			LogStatus: true,
+			LogURI:    true,
+			LogValuesFunc: func(c echo.Context, v middleware.RequestLoggerValues) error {
+				fmt.Printf("REQUEST: uri: %v, status: %v\n", v.URI, v.Status)
+				return nil
+			},
+		}))
 
 	e.Use(middleware.KeyAuth(func(key string, c echo.Context) (bool, error) {
 		return key == config.GetToken(), nil
