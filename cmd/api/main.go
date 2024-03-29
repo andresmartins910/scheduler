@@ -2,11 +2,13 @@ package main
 
 import (
 	"log"
+	"scheduler/config"
 	h "scheduler/pkg/handler"
 	m "scheduler/pkg/model"
 
 	"github.com/hibiken/asynq"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -30,6 +32,10 @@ func main() {
 	db.AutoMigrate(&m.Report{})
 
 	handler := &h.Handler{DB: db, Client: client}
+
+	e.Use(middleware.KeyAuth(func(key string, c echo.Context) (bool, error) {
+		return key == config.GetToken(), nil
+	}))
 
 	// Routes
 	e.GET("/", func(c echo.Context) error {
